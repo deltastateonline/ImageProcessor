@@ -16,19 +16,18 @@ namespace File_Processor
             }
             string processorId = args[0];
             Console.WriteLine("Connecting Processor {0} and wait on 127.0.0.1:5556", processorId);
-            using (var subscriber = new SubscriberSocket())
+            using (var subscriber = new PullSocket())
             {
-                subscriber.Connect("tcp://127.0.0.1:5556");               
-                subscriber.Subscribe("A");
-
+                subscriber.Connect("tcp://127.0.0.1:5556");  
+                int i = 0;
                 while (true)
-                {
-                    var topic = subscriber.ReceiveFrameString();                  
+                {                                
 
                     byte[] textBytes = Convert.FromBase64String(subscriber.ReceiveFrameString());
                     string decodedText = Encoding.UTF8.GetString(textBytes);    
 
-                    Console.WriteLine("{2}\t: From Publisher: {0} {1}", topic, decodedText, processorId);
+                    Console.WriteLine("{2}:{0}\tFrom Publisher:{1}", i, decodedText, processorId);
+                    i++;
                 }
             }
         }

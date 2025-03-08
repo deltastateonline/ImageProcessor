@@ -26,10 +26,10 @@ namespace File_listing
             
             string[] jpgFiles = Directory.GetFiles(path, "*.jpg");
 
-            using (var publisher = new PublisherSocket()) {
+            using (var publisher = new PushSocket()) {
 
-                //publisher.Bind("tcp://127.0.0.1:5556");
-                publisher.Bind("tcp://*:5556");
+                publisher.Bind("tcp://127.0.0.1:5556");
+                //publisher.Bind("tcp://*:5556");
                 int messageId = 0;
 
                 foreach (string file in jpgFiles)
@@ -42,10 +42,9 @@ namespace File_listing
 
                     byte[] textBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
                     string encodedText = Convert.ToBase64String(textBytes);
-                    Console.WriteLine(encodedText);
+                    Console.WriteLine("{0} - {1}" , messageId,encodedText);
 
-                    publisher
-                    .SendMoreFrame("A") // Topic
+                    publisher                   
                     .SendFrame(encodedText); // Message
 
                     messageId++;
