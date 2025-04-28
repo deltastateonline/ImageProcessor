@@ -3,27 +3,57 @@ using System.Text;
 using NetMQ.Sockets;
 using NetMQ;
 using System.Text.Json;
+using Common;
 
-namespace File_listing
+namespace ImageListing
 {
     public class Program
     {
         static void Main(string[] args)
         {
 
-            if (args.Length != 1)
+            if (args.Length != 3)
             {
-                Console.WriteLine("Please provide a folder path.");
+                Console.WriteLine("Required parameters not set. input-folder output-folder resize-percentage");
                 return;
             }
-            string path = args[0];
+
+            string path;
+            string outputPath ;
+            decimal resize;
+            try
+            {
+                 path = args[0];
+                 outputPath = args[1];
+                 resize = decimal.Parse(args[2]);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Arguments not correctly passed");
+                return ;
+            }
+
+            
 
             if (!Directory.Exists(path))
             {
                 Console.WriteLine($"The folder path '{path}' does not exist.");
                 return;
             }
-            
+
+            if (!Directory.Exists(outputPath))
+            {
+                Console.WriteLine($"The folder path '{outputPath}' does not exist.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(args[2]))
+            {
+                Console.WriteLine($"The resize parameter is required.");
+                return;
+            }
+
             string[] jpgFiles = Directory.GetFiles(path, "*.jpg");
 
             using (var publisher = new PushSocket()) {
@@ -34,10 +64,13 @@ namespace File_listing
 
                 foreach (string file in jpgFiles)
                 {
-                    var msg = new
+                    var msg = new ImageDef
                     {
-                        id = messageId,
-                        message = file
+                        Id = messageId.ToString(),
+                        Filename = file,
+                        InputFolder = path,
+                        OutputFolder = outputPath,
+                        Resize = resize
                     };
 
                     byte[] textBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));

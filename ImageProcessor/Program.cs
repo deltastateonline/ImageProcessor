@@ -2,14 +2,14 @@
 using NetMQ.Sockets;
 using System.Text;
 
-namespace File_Processor
+namespace ImageProcessor
 {
     internal class Program
     {
         static void Main(string[] args)
         {
 
-            if (args.Length != 1)
+            if (args.Length != 1) 
             {
                 Console.WriteLine("Please provide a processor id.");
                 return;

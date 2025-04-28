@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ImageListing": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\omo\\Documents\\NCAQ\\2025\\MENS EVENT_2025\" \"C:\\Users\\omo\\Documents\\NCAQ\\2025\\MENS EVENT_2025_CSharp\" 50"
+    }
+  }
+}
