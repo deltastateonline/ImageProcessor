@@ -23,13 +23,8 @@ namespace ImageProcessor
             }
             string processorId = args[0];
             Console.WriteLine("Connecting Processor {0} and wait on 127.0.0.1:5556", processorId);
-
-            //var imageDefChannel = Channel.CreateUnbounded<ImageDef>();
-            var imageDefChannel = Channel.CreateBounded<ImageDef>(3);
-            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
-
-
-            //_ = Task.Run(async delegate { 
+           
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };         
 
                 using (var subscriber = new PullSocket())
                 {
@@ -39,53 +34,16 @@ namespace ImageProcessor
                     {                                
 
                         byte[] textBytes = Convert.FromBase64String(subscriber.ReceiveFrameString());
-                        string decodedText = Encoding.UTF8.GetString(textBytes);    
-
-                        //Console.WriteLine("{0}:{1}", processorId, i);
+                        string decodedText = Encoding.UTF8.GetString(textBytes);                          
 
                         var imageDetails = JsonSerializer.Deserialize<ImageDef>(decodedText);
 
                         Console.WriteLine(JsonSerializer.Serialize(imageDetails, jsonSerializerOptions));
-
-                        ResizeImage(imageDetails);
-
-                        //await imageDefChannel.Writer.WriteAsync(imageDetails);
-
-                        //await imageDefChannel.Writer.WriteAsync(imageDetails);
-
-                        //imageDefChannel.Writer.Complete();
-
+                        ResizeImage(imageDetails);                   
 
                         i++;
-                    }
-
-                
+                    }                
                 }
-            //});
-
-
-
-            /*   Random rnd = new Random();
-               await foreach (ImageDef current in imageDefChannel.Reader.ReadAllAsync())
-               {
-                   int x = rnd.Next(1, 10);
-                   Console.WriteLine(x);
-                   await Task.Delay(x * 500);
-                   Console.WriteLine(JsonSerializer.Serialize(current, jsonSerializerOptions));
-
-               }
-
-            while (true)
-            {
-                var current = await imageDefChannel.Reader.ReadAsync();
-                Console.WriteLine(JsonSerializer.Serialize(current, jsonSerializerOptions));
-
-            }*/
-
-            /*
-             * while await imageDefChannel.Reader.WaitToReadAsync(){}
-             */
-
         }
 
         static void ResizeImage(ImageDef imageDef)
