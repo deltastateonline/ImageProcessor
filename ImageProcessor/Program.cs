@@ -1,6 +1,8 @@
 ﻿using Common;
 using NetMQ;
 using NetMQ.Sockets;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Text;
 using System.Text.Json;
@@ -27,7 +29,7 @@ namespace ImageProcessor
             JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
 
-            _ = Task.Run(async delegate { 
+            //_ = Task.Run(async delegate { 
 
                 using (var subscriber = new PullSocket())
                 {
@@ -43,9 +45,11 @@ namespace ImageProcessor
 
                         var imageDetails = JsonSerializer.Deserialize<ImageDef>(decodedText);
 
-                        //Console.WriteLine(JsonSerializer.Serialize(imageDetails, jsonSerializerOptions));
+                        Console.WriteLine(JsonSerializer.Serialize(imageDetails, jsonSerializerOptions));
 
-                        await imageDefChannel.Writer.WriteAsync(imageDetails);
+                        ResizeImage(imageDetails);
+
+                        //await imageDefChannel.Writer.WriteAsync(imageDetails);
 
                         //await imageDefChannel.Writer.WriteAsync(imageDetails);
 
@@ -57,7 +61,7 @@ namespace ImageProcessor
 
                 
                 }
-            });
+            //});
 
 
 
@@ -69,18 +73,42 @@ namespace ImageProcessor
                    await Task.Delay(x * 500);
                    Console.WriteLine(JsonSerializer.Serialize(current, jsonSerializerOptions));
 
-               }*/
+               }
 
             while (true)
             {
                 var current = await imageDefChannel.Reader.ReadAsync();
                 Console.WriteLine(JsonSerializer.Serialize(current, jsonSerializerOptions));
 
-            }
+            }*/
 
             /*
              * while await imageDefChannel.Reader.WaitToReadAsync(){}
              */
+
+        }
+
+        static void ResizeImage(ImageDef imageDef)
+        {
+
+            string inputPath = "";
+            string outputPath = imageDef.OutputFolder + "\\"+Path.GetFileName(imageDef.Filename);
+            using (Image image = Image.Load(imageDef.Filename))
+            {
+
+                var resizer = decimal.ToInt16(imageDef.Resize) * 0.01;
+
+                // Calculate new dimensions
+                int newWidth = (int) (image.Width * resizer);
+                int newHeight = (int)(image.Height * resizer);
+
+                // Resize the image
+                image.Mutate(x => x.Resize(newWidth, newHeight));
+
+                // Save the output
+                image.Save(outputPath);
+            }
+
 
         }
     }
