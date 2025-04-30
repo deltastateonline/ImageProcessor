@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ImageListing": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\omo\\Documents\\NCAQ\\2025\\Westpac Team\" \"C:\\Users\\omo\\Documents\\NCAQ\\2025\\Westpac Team_CSharp\" 20"
+    }
+  }
+}
