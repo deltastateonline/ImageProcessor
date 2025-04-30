@@ -29,45 +29,57 @@ namespace ImageProcessor
                 using (var subscriber = new PullSocket())
                 {
                     subscriber.Connect("tcp://127.0.0.1:5556");  
-                    int i = 0;
+                    int i = 1;
                     while (true)
-                    {                                
+                    {                    
 
-                        byte[] textBytes = Convert.FromBase64String(subscriber.ReceiveFrameString());
+                        if (!subscriber.TryReceiveFrameString(TimeSpan.FromMilliseconds(5000), out string receivedFrame))
+                        {
+                            Console.WriteLine("Timeout reached, no more messages. Exiting...");
+                            break;
+                        }
+
+                        byte[] textBytes = Convert.FromBase64String(receivedFrame);
                         string decodedText = Encoding.UTF8.GetString(textBytes);                          
 
                         var imageDetails = JsonSerializer.Deserialize<ImageDef>(decodedText);
 
                         Console.WriteLine(JsonSerializer.Serialize(imageDetails, jsonSerializerOptions));
-                        ResizeImage(imageDetails);                   
+                        await ResizeImage(imageDetails);                   
 
                         i++;
-                    }                
+                    }
+
+                    Console.WriteLine($"{i} messages processed.");
+
                 }
         }
 
-        static void ResizeImage(ImageDef imageDef)
+        static async Task ResizeImage(ImageDef imageDef)
         {
 
-            string inputPath = "";
-            string outputPath = imageDef.OutputFolder + "\\"+Path.GetFileName(imageDef.Filename);
-            using (Image image = Image.Load(imageDef.Filename))
-            {
+           await Task.Run(() => { 
 
-                var resizer = decimal.ToInt16(imageDef.Resize) * 0.01;
+                
+                string outputPath = imageDef.OutputFolder + "\\"+Path.GetFileName(imageDef.Filename);
+                using (Image image = Image.Load(imageDef.Filename))
+                {
 
-                // Calculate new dimensions
-                int newWidth = (int) (image.Width * resizer);
-                int newHeight = (int)(image.Height * resizer);
+                    var resizer = decimal.ToInt16(imageDef.Resize) * 0.01;
 
-                // Resize the image
-                image.Mutate(x => x.Resize(newWidth, newHeight));
+                    // Calculate new dimensions
+                    int newWidth = (int) (image.Width * resizer);
+                    int newHeight = (int)(image.Height * resizer);
 
-                // Save the output
-                image.Save(outputPath);
-            }
+                    // Resize the image
+                    image.Mutate(x => x.Resize(newWidth, newHeight));
 
+                    // Save the output
+                    image.Save(outputPath);
+                }
+            });
 
+            return ;
         }
     }
 }
