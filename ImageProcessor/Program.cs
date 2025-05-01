@@ -31,8 +31,8 @@ namespace ImageProcessor
                     subscriber.Connect("tcp://127.0.0.1:5556");  
                     int i = 1;
                     while (true)
-                    {                    
-
+                    {
+                    
                         if (!subscriber.TryReceiveFrameString(TimeSpan.FromMilliseconds(5000), out string receivedFrame))
                         {
                             Console.WriteLine("Timeout reached, no more messages. Exiting...");
