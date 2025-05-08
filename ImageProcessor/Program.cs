@@ -1,6 +1,7 @@
 ﻿using Common;
 using NetMQ;
 using NetMQ.Sockets;
+using ProtoBuf;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -39,10 +40,8 @@ namespace ImageProcessor
                             break;
                         }
 
-                        byte[] textBytes = Convert.FromBase64String(receivedFrame);
-                        string decodedText = Encoding.UTF8.GetString(textBytes);                          
-
-                        var imageDetails = JsonSerializer.Deserialize<ImageDef>(decodedText);
+                        byte[] textBytes = Convert.FromBase64String(receivedFrame); 
+                        var imageDetails = DeserializeObject<ImageDefProto>(textBytes);  
 
                         Console.WriteLine(JsonSerializer.Serialize(imageDetails, jsonSerializerOptions));
                         await ResizeImage(imageDetails);                   
@@ -55,7 +54,7 @@ namespace ImageProcessor
                 }
         }
 
-        static async Task ResizeImage(ImageDef imageDef)
+        static async Task ResizeImage(ImageDefProto imageDef) 
         {
 
            await Task.Run(() => { 
@@ -80,6 +79,18 @@ namespace ImageProcessor
             });
 
             return ;
+        }
+
+
+        public static T DeserializeObject<T>(byte[] data)
+        {
+            T obj = default(T);
+            using (var stream = new MemoryStream(data))
+            {
+                obj = Serializer.Deserialize<T>(stream);
+            }
+
+            return obj;
         }
     }
 }

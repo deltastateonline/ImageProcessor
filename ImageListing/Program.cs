@@ -1,9 +1,9 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-using System.Text;
-using NetMQ.Sockets;
+﻿using Common;
 using NetMQ;
+using NetMQ.Sockets;
+using ProtoBuf;
+using System.Text;
 using System.Text.Json;
-using Common;
 
 namespace ImageListing
 {
@@ -64,7 +64,7 @@ namespace ImageListing
 
                 foreach (string file in jpgFiles)
                 {
-                    var msg = new ImageDef
+                    var msg = new ImageDefProto
                     {
                         Id = messageId.ToString(),
                         Filename = file,
@@ -73,12 +73,11 @@ namespace ImageListing
                         Resize = resize
                     };
 
-                    byte[] textBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
-                    string encodedText = Convert.ToBase64String(textBytes);
+                    //byte[] textBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
+                    string encodedText = Convert.ToBase64String(ProotoSerialize(msg));
                     Console.WriteLine("{0} - {1}" , messageId,encodedText);
 
-                    publisher                   
-                    .SendFrame(encodedText); // Message
+                    publisher.SendFrame(encodedText); // Message                   
 
                     messageId++;
 
@@ -86,6 +85,14 @@ namespace ImageListing
 
                 }
             }
+        }
+
+        private static byte[] ProotoSerialize<T>(T record) where T : class
+        {
+
+            using var stream = new MemoryStream();
+            Serializer.Serialize(stream, record);
+            return stream.ToArray();
         }
     }
 }
