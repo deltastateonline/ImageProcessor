@@ -59,7 +59,7 @@ namespace ImageListing
             using (var publisher = new PushSocket()) {
 
                 publisher.Bind("tcp://127.0.0.1:5556");
-                //publisher.Bind("tcp://*:5556");
+
                 int messageId = 0;
 
                 foreach (string file in jpgFiles)
@@ -72,8 +72,7 @@ namespace ImageListing
                         OutputFolder = outputPath,
                         Resize = resize
                     };
-
-                    //byte[] textBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
+                    
                     string encodedText = Convert.ToBase64String(ProotoSerialize(msg));
                     Console.WriteLine("{0} - {1}" , messageId,encodedText);
 
