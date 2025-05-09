@@ -41,7 +41,7 @@ namespace ImageProcessor
                         }
 
                         byte[] textBytes = Convert.FromBase64String(receivedFrame); 
-                        var imageDetails = DeserializeObject<ImageDefProto>(textBytes);  
+                        var imageDetails = ProtobufHelpers.DeserializeObject<ImageDefProto>(textBytes);  
 
                         Console.WriteLine(JsonSerializer.Serialize(imageDetails, jsonSerializerOptions));
                         await ResizeImage(imageDetails);                   
@@ -79,18 +79,6 @@ namespace ImageProcessor
             });
 
             return ;
-        }
-
-
-        public static T DeserializeObject<T>(byte[] data)
-        {
-            T obj = default(T);
-            using (var stream = new MemoryStream(data))
-            {
-                obj = Serializer.Deserialize<T>(stream);
-            }
-
-            return obj;
-        }
+        }        
     }
 }

@@ -2,8 +2,6 @@
 using NetMQ;
 using NetMQ.Sockets;
 using ProtoBuf;
-using System.Text;
-using System.Text.Json;
 
 namespace ImageListing
 {
@@ -73,25 +71,14 @@ namespace ImageListing
                         Resize = resize
                     };
                     
-                    string encodedText = Convert.ToBase64String(ProotoSerialize(msg));
+                    string encodedText = Convert.ToBase64String(ProtobufHelpers.SerializeObject(msg));
                     Console.WriteLine("{0} - {1}" , messageId,encodedText);
-
-                    publisher.SendFrame(encodedText); // Message                   
-
+                    publisher.SendFrame(encodedText); 
                     messageId++;
-
                     Thread.Sleep(500);
 
                 }
             }
-        }
-
-        private static byte[] ProotoSerialize<T>(T record) where T : class
-        {
-
-            using var stream = new MemoryStream();
-            Serializer.Serialize(stream, record);
-            return stream.ToArray();
-        }
+        }        
     }
 }
