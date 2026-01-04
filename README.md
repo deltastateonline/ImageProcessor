@@ -1,7 +1,9 @@
 # ImageProcessor
 ![Publisher / Subscriber Pattern](images/pubsub.jpg)
 
-This repo contains projects which implement the pub / sub pattern to resize images.
+This repo contains projects which implement the pub / sub pattern to resize images. Read more about this at
+1. [C# Image Resizer Using ZeroMQ](https://dev.to/agbagbarao/c-image-resizer-using-zeromq-59e0)
+2. [C# Image Resizer Using ZeroMQ and Protobuf](https://dev.to/agbagbarao/c-image-resizer-using-zeromq-and-protobuf-24nd)
 
 ## Implementation
 Implemented with 
